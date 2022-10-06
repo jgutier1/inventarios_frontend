@@ -3,7 +3,7 @@ import{axiosInstance} from "../helpers/axios-config";
 const getInventarios =() => {
     return axiosInstance.get("inventario", {
         headers: {
-            "content-type": "aplication/json"
+            "content-type": "application/json"
         }
     });
 
@@ -22,7 +22,7 @@ const crearInventario =(data) => {
 const editInventario =(inventarioId,data) => {
     return axiosInstance.put(`inventario/${inventarioId}`,data, {
         headers: {
-            "content-type": "aplication/json"
+            "content-type": "application/json"
         }
     });
 
