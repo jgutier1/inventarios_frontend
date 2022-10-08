@@ -8,11 +8,21 @@ import { gettipoEquipos } from "../../services/tipo-EquipoService";
 
 import { getestadoEquipo } from "../../services/estado-EquipoService";
 
+import {crearInventario} from "../../services/inventarioService";
+
+import Swal  from "sweetalert2";
+
+
+
 export const InventarioNew = ({ handleOpenModal }) => {
+
   const [usuarios, setUsuarios] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [tipos, setTipos] = useState([]);
   const [estados, setEstados] = useState([]);
+  const [valoresForm,setValoresForm ] = useState ({});
+  const{ serial = "",modelo = "",descripcion = "",color = "",foto = "",
+  fechaCompra = "",precio = "",  usuario, marca, tipo, estado } = valoresForm;
 
   const listarUsuarios = async () => {
     try {
@@ -63,6 +73,58 @@ export const InventarioNew = ({ handleOpenModal }) => {
     listarEstados();
   }, []);
 
+   const handleOnChage =({target}) => {
+    const { name,value } =target;
+    setValoresForm({ ... valoresForm, [name]: value }); // sprea
+
+   }
+
+
+   const handleonSubmit = async (e) => {
+      e.preventDefault ();
+     const inventario ={ serial, modelo, descripcion, color, foto, fechaCompra, precio, 
+      usuario: {
+        _id: usuario
+      },
+
+      marca: {
+        _id: marca
+      },
+
+      tipoEquipo: {
+        _id: tipo
+      },
+
+      estadoEquipo: {
+        _id: estado
+      }
+     }
+
+
+     console.log(inventario);
+
+     try {
+
+      Swal .fire ({
+        allowOutsideClick: false,
+        text: "Cargando..."
+
+      });
+      Swal.showLoading();
+
+      const {data} = await crearInventario (inventario);
+      console.log (data);
+      Swal.close();
+
+     } catch (error){
+      console.log (error);
+      Swal.close();
+     }
+
+
+   }
+
+
   return (
     <div className="sidebar">
       <div className="container-fluid">
@@ -82,28 +144,36 @@ export const InventarioNew = ({ handleOpenModal }) => {
             <hr />
           </div>
         </div>
-        <form>
+        <form onSubmit={(e) => handleonSubmit (e)}>
           <div className="row">
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Serial</label>
-                <input type="text" name="serial" className="form-control" />
+                <input type="text" name="serial"
+                required 
+                value={serial} onChange ={ (e) => handleOnChage (e) }
+                className="form-control" />
               </div>
             </div>
 
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Modelo</label>
-                <input type="text" name="modelo" className="form-control" />
+                <input type="text" name="modelo" 
+                required 
+                value={modelo} onChange ={ (e) => handleOnChage (e) } 
+                className="form-control" />
               </div>
             </div>
 
             <div className="col">
               <div className="mb-3">
-                <label className="form-label">Descripcio</label>
+                <label className="form-label">Descripcion</label>
                 <input
                   type="text"
-                  name="descriipcion"
+                  name="descripcion" 
+                  required 
+                  value={descripcion} onChange ={ (e) => handleOnChage (e) }
                   className="form-control"
                 />
               </div>
@@ -112,7 +182,10 @@ export const InventarioNew = ({ handleOpenModal }) => {
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Color</label>
-                <input type="text" name="color" className="form-control" />
+                <input type="text" name="color"
+                required 
+                value={color} onChange ={ (e) => handleOnChage (e) }
+                className="form-control" />
               </div>
             </div>
           </div>
@@ -124,16 +197,19 @@ export const InventarioNew = ({ handleOpenModal }) => {
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Foto</label>
-                <input type="text" name="foto" className="form-control" />
+                <input type="url" name="foto" 
+                required 
+                value={foto} onChange ={ (e) => handleOnChage (e) }
+                className="form-control" />
               </div>
             </div>
 
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Fecha Compra</label>
-                <input
-                  type="date"
-                  name="fechaCompra"
+                <input type="date"name="fechaCompra" 
+                required 
+                value={fechaCompra} onChange ={ (e) => handleOnChage (e) }
                   className="form-control"
                 />
               </div>
@@ -142,14 +218,22 @@ export const InventarioNew = ({ handleOpenModal }) => {
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Precio</label>
-                <input type="number" name="precio" className="form-control" />
+                <input type="number" name="precio"
+                required  
+                value={precio} onChange ={ (e) => handleOnChage (e) }
+                className="form-control" />
               </div>
             </div>
+
 
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Usuario</label>
-                <select className="form-select">
+                <select className="form-select"
+                onChange ={ (e) => handleOnChage (e) }
+                name = "usuario"
+                required 
+                  value={usuario}>
                   <option defaultValue>--Seleccione--</option>
                   {usuarios.length > 0 ? (
                     usuarios.map((usuario) => {
@@ -171,7 +255,11 @@ export const InventarioNew = ({ handleOpenModal }) => {
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Marca</label>
-                <select className="form-select">
+                <select className="form-select"
+                onChange ={ (e) => handleOnChage (e) }
+                name = "marca"
+                required 
+                value={marca}>
                 <option Value="">--Seleccione--</option> {
 
                   marcas.map(({ _id,nombre }) => {
@@ -186,7 +274,11 @@ export const InventarioNew = ({ handleOpenModal }) => {
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Tipo Equipo</label>
-                <select className="form-select">
+                <select className="form-select"
+                onChange ={ (e) => handleOnChage (e) }
+                name = "tipo"
+                required 
+                value={tipo}>
                 <option Value="">--Seleccione--</option> {
 
                   tipos.map(({ _id,nombre }) => {
@@ -201,7 +293,11 @@ export const InventarioNew = ({ handleOpenModal }) => {
             <div className="col">
               <div className="mb-3">
                 <label className="form-label">Estado Equipo</label>
-                <select className="form-select">
+                <select className="form-select"
+                onChange ={ (e) => handleOnChage (e) }
+                name = "estado"
+                required 
+                value={estado}>
                 <option Value="">--Seleccione--</option> {
 
                   estados.map(({ _id,nombre }) => {
@@ -211,8 +307,15 @@ export const InventarioNew = ({ handleOpenModal }) => {
               }
                 </select>
               </div>
-            </div>
+            </div> 
           </div>
+
+
+           <div className = "row" >
+           <div className = "col" >
+           <button className="btn btn-success">Guardar</button>
+           </div>
+           </div>
         </form>
       </div>
     </div>
